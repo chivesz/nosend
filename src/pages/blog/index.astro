@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<Layout
+  title="Blog — nosend.io"
+  description="Guides on image compression, file privacy, and browser-based tools. No uploads, no servers, no tracking."
+>
+  <Header />
+  <main class="flex-1 max-w-3xl mx-auto px-4 sm:px-6 py-16">
+    <h1 class="text-3xl font-bold text-slate-900 mb-2">Blog</h1>
+    <p class="text-slate-500 mb-12">Guides on image compression, file privacy, and doing more without uploading your files anywhere.</p>
+
+    <ul class="space-y-8">
+      {posts.map(post => (
+        <li>
+          <a href={`/blog/${post.slug}`} class="group block">
+            <h2 class="text-lg font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors mb-1">
+              {post.data.title}
+            </h2>
+            <p class="text-slate-500 text-sm leading-relaxed">{post.data.description}</p>
+            <span class="text-xs text-slate-400 mt-2 block">
+              {post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </main>
+  <Footer />
+</Layout>
