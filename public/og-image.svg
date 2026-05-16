@@ -2,33 +2,41 @@
   <!-- Background -->
   <rect width="1200" height="630" fill="#ffffff"/>
 
-  <!-- Indigo accent bar on left -->
+  <!-- Indigo left bar -->
   <rect width="12" height="630" fill="#4F46E5"/>
 
-  <!-- Bottom gradient strip -->
-  <rect y="570" width="1200" height="60" fill="#f8f8ff"/>
+  <!-- Indigo icon background circle -->
+  <circle cx="160" cy="290" r="90" fill="#EEF2FF"/>
 
-  <!-- Logo placeholder circle -->
-  <circle cx="160" cy="280" r="80" fill="#EEF2FF"/>
-  <image href="https://nosend.io/logo.png" x="100" y="220" width="120" height="120"/>
+  <!-- House shape -->
+  <polygon points="160,210 220,255 220,340 100,340 100,255" fill="#4F46E5"/>
+  <!-- Roof peak -->
+  <polygon points="160,195 235,248 85,248" fill="#4338CA"/>
+  <!-- Door -->
+  <rect x="143" y="300" width="34" height="40" rx="4" fill="#EEF2FF"/>
+  <!-- Document in house -->
+  <rect x="135" y="255" width="30" height="36" rx="2" fill="white" opacity="0.9"/>
+  <line x1="140" y1="263" x2="160" y2="263" stroke="#4F46E5" stroke-width="2"/>
+  <line x1="140" y1="269" x2="160" y2="269" stroke="#4F46E5" stroke-width="2"/>
+  <line x1="140" y1="275" x2="153" y2="275" stroke="#4F46E5" stroke-width="2"/>
 
-  <!-- nosend.io wordmark -->
-  <text x="280" y="260" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="700" fill="#4F46E5">no</text>
-  <text x="388" y="260" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="700" fill="#0F172A">send.io</text>
+  <!-- no send.io wordmark -->
+  <text x="290" y="275" font-family="system-ui, -apple-system, sans-serif" font-size="80" font-weight="700" fill="#4F46E5">no</text>
+  <text x="420" y="275" font-family="system-ui, -apple-system, sans-serif" font-size="80" font-weight="700" fill="#0F172A">send.io</text>
 
   <!-- Tagline -->
-  <text x="280" y="320" font-family="system-ui, -apple-system, sans-serif" font-size="32" fill="#64748B">Compress images without uploading them.</text>
+  <text x="290" y="335" font-family="system-ui, -apple-system, sans-serif" font-size="34" fill="#64748B">Compress images without uploading them.</text>
 
-  <!-- Feature pills -->
-  <rect x="280" y="370" width="200" height="44" rx="22" fill="#EEF2FF"/>
-  <text x="380" y="398" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#4F46E5" text-anchor="middle">No uploads</text>
+  <!-- Pills -->
+  <rect x="290" y="385" width="210" height="48" rx="24" fill="#EEF2FF"/>
+  <text x="395" y="415" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#4F46E5" text-anchor="middle">No uploads</text>
 
-  <rect x="498" y="370" width="220" height="44" rx="22" fill="#EEF2FF"/>
-  <text x="608" y="398" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#4F46E5" text-anchor="middle">No account</text>
+  <rect x="518" y="385" width="220" height="48" rx="24" fill="#EEF2FF"/>
+  <text x="628" y="415" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#4F46E5" text-anchor="middle">No account</text>
 
-  <rect x="736" y="370" width="230" height="44" rx="22" fill="#EEF2FF"/>
-  <text x="851" y="398" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#4F46E5" text-anchor="middle">No tracking</text>
+  <rect x="756" y="385" width="230" height="48" rx="24" fill="#EEF2FF"/>
+  <text x="871" y="415" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#4F46E5" text-anchor="middle">No tracking</text>
 
-  <!-- URL -->
-  <text x="280" y="590" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#94A3B8">nosend.io</text>
+  <!-- Bottom URL -->
+  <text x="290" y="580" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#94A3B8">nosend.io</text>
 </svg>
