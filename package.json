@@ -19,5 +19,8 @@
     "heic2any": "^0.0.4",
     "pdf-lib": "^1.17.1",
     "tailwindcss": "^4.3.0"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
   }
 }
