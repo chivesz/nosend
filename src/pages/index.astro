@@ -1,17 +1,355 @@
 ---
-
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout>
+  <Header />
+
+  <main class="flex-1">
+    <!-- Hero -->
+    <section class="max-w-5xl mx-auto px-4 sm:px-6 pt-12 pb-8 text-center">
+      <div class="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full mb-5">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+        Files processed entirely in your browser
+      </div>
+      <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 tracking-tight leading-tight mb-4">
+        Compress images without<br class="hidden sm:block" /> uploading them
+      </h1>
+      <p class="text-lg text-slate-500 max-w-xl mx-auto">
+        Your files never leave your device. No server, no account, no size limits. Free forever.
+      </p>
+    </section>
+
+    <!-- Drop Zone -->
+    <section class="max-w-3xl mx-auto px-4 sm:px-6 pb-6">
+      <div
+        id="drop-zone"
+        class="border-2 border-dashed border-slate-300 rounded-2xl p-10 sm:p-16 text-center cursor-pointer transition-all duration-150 hover:border-indigo-400 hover:bg-indigo-50/40 select-none"
+      >
+        <div id="drop-idle">
+          <div class="flex justify-center mb-4">
+            <svg class="w-12 h-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+            </svg>
+          </div>
+          <p class="text-base font-medium text-slate-700 mb-1">Drop images here or <span class="text-indigo-600">click to browse</span></p>
+          <p class="text-sm text-slate-400">JPG, PNG, WEBP, GIF &mdash; no file size limit</p>
+        </div>
+        <div id="drop-active" class="hidden">
+          <div class="flex justify-center mb-4">
+            <svg class="w-12 h-12 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+            </svg>
+          </div>
+          <p class="text-base font-semibold text-indigo-700">Drop to compress</p>
+        </div>
+        <input id="file-input" type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif,.heic,.heif" class="hidden" />
+      </div>
+
+      <!-- Quality Slider -->
+      <div id="quality-row" class="hidden mt-4 bg-slate-50 rounded-xl px-5 py-3 flex items-center gap-4">
+        <label for="quality-slider" class="text-sm font-medium text-slate-600 whitespace-nowrap">
+          Quality: <span id="quality-value" class="text-indigo-600 font-semibold">80</span>%
+        </label>
+        <input
+          id="quality-slider"
+          type="range"
+          min="20"
+          max="100"
+          value="80"
+          step="5"
+          class="flex-1 accent-indigo-600 cursor-pointer"
+        />
+        <button
+          id="recompress-btn"
+          class="text-xs font-medium px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors whitespace-nowrap"
+        >
+          Recompress
+        </button>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <section class="max-w-3xl mx-auto px-4 sm:px-6 pb-8">
+      <div id="results" class="space-y-3"></div>
+      <div id="download-all-row" class="hidden mt-5 flex justify-center">
+        <button
+          id="download-all-btn"
+          class="inline-flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+          Download All
+        </button>
+      </div>
+    </section>
+
+    <!-- Why nosend -->
+    <section class="bg-slate-50 py-14">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+        <h2 class="text-2xl font-bold text-slate-900 text-center mb-10">Why nosend?</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            {
+              icon: 'M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z',
+              title: 'Zero uploads',
+              desc: 'All processing happens in your browser using JavaScript. Nothing is ever sent to any server.',
+            },
+            {
+              icon: 'M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z',
+              title: 'No file size limit',
+              desc: "TinyPNG caps you at 5MB. We don't. Compress images from your DSLR or iPhone at full resolution.",
+            },
+            {
+              icon: 'M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3',
+              title: 'No batch limit',
+              desc: 'Compress 20, 50, or 200 images at once. The free tier handles as many files as you need.',
+            },
+            {
+              icon: 'M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75',
+              title: 'Quality control',
+              desc: 'A quality slider lets you choose between maximum compression and best quality — your call.',
+            },
+            {
+              icon: 'M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0H3',
+              title: 'Works offline',
+              desc: 'After the first load, the tool works without an internet connection. Your files stay yours.',
+            },
+            {
+              icon: 'M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z',
+              title: 'No account needed',
+              desc: 'Open the page, drop your files, download. No email, no sign-up, no tracking.',
+            },
+          ].map(({ icon, title, desc }) => (
+            <div class="bg-white rounded-xl p-6 border border-slate-100">
+              <div class="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center mb-4">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d={icon} />
+                </svg>
+              </div>
+              <h3 class="font-semibold text-slate-900 mb-1">{title}</h3>
+              <p class="text-sm text-slate-500 leading-relaxed">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Support Section -->
+    <section class="py-14">
+      <div class="max-w-xl mx-auto px-4 sm:px-6 text-center">
+        <h2 class="text-2xl font-bold text-slate-900 mb-3">Keep it free</h2>
+        <p class="text-slate-500 mb-8 max-w-sm mx-auto">
+          nosend.io is completely free, no ads, no account required. If it saved you time, a small donation keeps the lights on.
+        </p>
+
+        <!-- Ko-fi -->
+        <a
+          href="https://ko-fi.com/nosend"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-3 px-8 py-3.5 bg-[#FF5E5B] text-white font-semibold rounded-xl hover:bg-[#e54e4b] transition-colors text-base"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.709-.965-1.041-2.7-.091-3.71.951-1.01 3.005-1.086 4.363.407 0 0 1.565-1.782 3.468-.963 1.904.82 1.832 2.554.723 4.311zm6.173.478c-.928.116-1.682.028-1.682.028V7.284h1.77s1.971.551 1.971 2.638c0 1.913-.985 2.667-2.059 3.015z"/>
+          </svg>
+          Buy me a coffee
+        </a>
+
+        <!-- Crypto -->
+        <div class="mt-8 space-y-3 text-left">
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest text-center mb-4">Or donate crypto</p>
+
+          {[
+            { label: 'ETH', address: '0xcf0ea7f9cfdc0aa7d53ca1f37c02fd1dc627e4fb' },
+            { label: 'BTC', address: 'bc1qmtcfgvmpjgdm5wcyy4kww68v89a9eac49pr409' },
+          ].map(({ label, address }) => (
+            <div class="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+              <span class="text-xs font-bold text-slate-500 w-8 flex-shrink-0">{label}</span>
+              <span class="flex-1 text-xs text-slate-700 font-mono truncate" title={address}>{address}</span>
+              <button
+                class="copy-btn flex-shrink-0 text-xs font-medium px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors"
+                data-address={address}
+              >
+                Copy
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <p class="text-xs text-slate-400 mt-6">Entirely optional. The tool is free forever either way.</p>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  import { compressImage, formatBytes } from '../scripts/compress';
+
+  const dropZone = document.getElementById('drop-zone')!;
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  const dropIdle = document.getElementById('drop-idle')!;
+  const dropActive = document.getElementById('drop-active')!;
+  const results = document.getElementById('results')!;
+  const qualityRow = document.getElementById('quality-row')!;
+  const qualitySlider = document.getElementById('quality-slider') as HTMLInputElement;
+  const qualityValue = document.getElementById('quality-value')!;
+  const recompressBtn = document.getElementById('recompress-btn')!;
+  const downloadAllRow = document.getElementById('download-all-row')!;
+  const downloadAllBtn = document.getElementById('download-all-btn')!;
+
+  let currentFiles: File[] = [];
+  let dragCounter = 0;
+
+  function setDropActive(active: boolean) {
+    dropIdle.classList.toggle('hidden', active);
+    dropActive.classList.toggle('hidden', !active);
+    dropZone.classList.toggle('border-indigo-500', active);
+    dropZone.classList.toggle('bg-indigo-50', active);
+  }
+
+  dropZone.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('input')) return;
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files?.length) processFiles(Array.from(fileInput.files));
+  });
+
+  dropZone.addEventListener('dragenter', (e) => {
+    e.preventDefault();
+    if (++dragCounter === 1) setDropActive(true);
+  });
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+  });
+
+  dropZone.addEventListener('dragleave', () => {
+    if (--dragCounter === 0) setDropActive(false);
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dragCounter = 0;
+    setDropActive(false);
+    const files = Array.from(e.dataTransfer?.files ?? []).filter(isImageFile);
+    if (files.length) processFiles(files);
+  });
+
+  qualitySlider.addEventListener('input', () => {
+    qualityValue.textContent = qualitySlider.value;
+  });
+
+  recompressBtn.addEventListener('click', () => {
+    if (currentFiles.length) processFiles(currentFiles);
+  });
+
+  downloadAllBtn.addEventListener('click', async () => {
+    const cards = Array.from(results.querySelectorAll<HTMLElement>('[data-download-url]'));
+    for (const card of cards) {
+      const url = card.dataset.downloadUrl!;
+      const name = card.dataset.downloadName!;
+      const a = Object.assign(document.createElement('a'), { href: url, download: name });
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      await new Promise(r => setTimeout(r, 200));
+    }
+  });
+
+  function isImageFile(f: File) {
+    return f.type.startsWith('image/') || /\.(heic|heif)$/i.test(f.name);
+  }
+
+  async function processFiles(files: File[]) {
+    currentFiles = files;
+    results.innerHTML = '';
+    qualityRow.classList.remove('hidden');
+    downloadAllRow.classList.remove('hidden');
+
+    const quality = parseInt(qualitySlider.value) / 100;
+
+    await Promise.all(files.map(async (file) => {
+      const card = buildCard(file.name, file.size);
+      results.appendChild(card);
+      try {
+        const compressed = await compressImage(file, quality);
+        fillCard(card, file, compressed);
+      } catch {
+        card.querySelector('.card-status')!.textContent = 'Could not process this file';
+      }
+    }));
+  }
+
+  function buildCard(name: string, size: number): HTMLElement {
+    const div = document.createElement('div');
+    div.className = 'flex items-center gap-4 bg-white border border-slate-100 rounded-xl px-5 py-4 shadow-sm';
+    div.innerHTML = `
+      <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0 text-slate-400">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+        </svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-medium text-slate-800 truncate">${name}</p>
+        <p class="text-xs text-slate-400 card-status mt-0.5">Processing…</p>
+      </div>
+      <div class="text-right text-sm text-slate-500 flex-shrink-0 card-sizes hidden">
+        <span class="line-through card-original-size text-slate-400"></span>
+        <span class="mx-1 text-slate-300">&rarr;</span>
+        <span class="font-semibold text-emerald-600 card-new-size"></span>
+        <span class="ml-1 text-xs text-emerald-500 card-savings"></span>
+      </div>
+      <a class="card-download hidden flex-shrink-0 p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Download">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+        </svg>
+      </a>
+    `;
+    return div;
+  }
+
+  function fillCard(card: HTMLElement, original: File, compressed: Blob) {
+    const savings = Math.round((1 - compressed.size / original.size) * 100);
+    const outputName = original.name.replace(/\.(heic|heif)$/i, '.jpg');
+
+    card.querySelector('.card-status')!.textContent = savings > 0 ? `${savings}% smaller` : 'Already optimized';
+    card.querySelector('.card-original-size')!.textContent = formatBytes(original.size);
+    card.querySelector('.card-new-size')!.textContent = formatBytes(compressed.size);
+    card.querySelector('.card-savings')!.textContent = savings > 0 ? `(-${savings}%)` : '';
+    card.querySelector('.card-sizes')!.classList.remove('hidden');
+
+    const url = URL.createObjectURL(compressed);
+    const dl = card.querySelector('.card-download') as HTMLAnchorElement;
+    dl.href = url;
+    dl.download = outputName;
+    dl.classList.remove('hidden');
+
+    card.dataset.downloadUrl = url;
+    card.dataset.downloadName = outputName;
+  }
+
+  // Crypto copy buttons
+  document.querySelectorAll<HTMLButtonElement>('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const address = btn.dataset.address!;
+      await navigator.clipboard.writeText(address);
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      btn.classList.add('text-emerald-600', 'border-emerald-300');
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('text-emerald-600', 'border-emerald-300');
+      }, 2000);
+    });
+  });
+</script>
