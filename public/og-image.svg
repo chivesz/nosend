@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#ffffff"/>
+
+  <!-- Indigo accent bar on left -->
+  <rect width="12" height="630" fill="#4F46E5"/>
+
+  <!-- Bottom gradient strip -->
+  <rect y="570" width="1200" height="60" fill="#f8f8ff"/>
+
+  <!-- Logo placeholder circle -->
+  <circle cx="160" cy="280" r="80" fill="#EEF2FF"/>
+  <image href="/logo.png" x="100" y="220" width="120" height="120"/>
+
+  <!-- nosend.io wordmark -->
+  <text x="280" y="260" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="700" fill="#4F46E5">no</text>
+  <text x="388" y="260" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="700" fill="#0F172A">send.io</text>
+
+  <!-- Tagline -->
+  <text x="280" y="320" font-family="system-ui, -apple-system, sans-serif" font-size="32" fill="#64748B">Compress images without uploading them.</text>
+
+  <!-- Feature pills -->
+  <rect x="280" y="370" width="200" height="44" rx="22" fill="#EEF2FF"/>
+  <text x="380" y="398" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#4F46E5" text-anchor="middle">No uploads</text>
+
+  <rect x="498" y="370" width="220" height="44" rx="22" fill="#EEF2FF"/>
+  <text x="608" y="398" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#4F46E5" text-anchor="middle">No account</text>
+
+  <rect x="736" y="370" width="230" height="44" rx="22" fill="#EEF2FF"/>
+  <text x="851" y="398" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#4F46E5" text-anchor="middle">No tracking</text>
+
+  <!-- URL -->
+  <text x="280" y="590" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#94A3B8">nosend.io</text>
+</svg>
