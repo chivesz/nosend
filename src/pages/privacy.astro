@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout
+  title="Privacy Policy — nosend.io"
+  description="nosend.io privacy policy. We don't collect, store, or transmit your files or personal data."
+>
+  <Header />
+  <main class="flex-1 max-w-3xl mx-auto px-4 sm:px-6 py-16">
+    <h1 class="text-3xl font-bold text-slate-900 mb-2">Privacy Policy</h1>
+    <p class="text-sm text-slate-400 mb-10">Last updated: May 2026</p>
+
+    <div class="prose prose-slate max-w-none space-y-8 text-slate-600">
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-800 mb-2">The short version</h2>
+        <p>We don't collect anything. Your files never leave your device. There are no accounts, no tracking, no analytics, and no servers involved in processing your files.</p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-800 mb-2">How file processing works</h2>
+        <p>All compression and conversion on nosend.io runs entirely inside your browser using standard web APIs. When you select a file, it is read locally by your browser and processed in memory. No file data is ever transmitted to any server.</p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-800 mb-2">Data we collect</h2>
+        <p>None. We do not collect personal information, usage data, or file metadata. We do not use cookies or local storage for tracking purposes.</p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibent text-slate-800 mb-2">Third-party services</h2>
+        <p>nosend.io is hosted on Cloudflare Pages. Cloudflare may collect standard web server logs (IP address, request path, timestamp) as part of serving the site. This is outside our control. See <a href="https://www.cloudflare.com/privacypolicy/" class="text-indigo-600 underline" target="_blank" rel="noopener">Cloudflare's privacy policy</a> for details.</p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-800 mb-2">Donations</h2>
+        <p>If you choose to donate via Ko-fi or cryptocurrency, those transactions are handled entirely by those platforms. We do not receive or store any payment details.</p>
+      </section>
+
+      <section>
+        <h2 class="text-lg font-semibold text-slate-800 mb-2">Changes to this policy</h2>
+        <p>If we ever change how this site works in a way that affects privacy, we will update this page. The date at the top reflects when this policy was last revised.</p>
+      </section>
+
+    </div>
+  </main>
+  <Footer />
+</Layout>
