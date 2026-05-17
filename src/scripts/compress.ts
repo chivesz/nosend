@@ -1,24 +1,30 @@
 /**
  * Compresses an image file entirely in the browser.
- * HEIC/HEIF files are converted to JPEG via heic2any before compression.
+ * HEIC/HEIF files are converted via heic2any before compression.
  * All other formats use the Canvas API — no server, no upload.
  */
-export async function compressImage(file: File, quality = 0.8): Promise<Blob> {
+export async function compressImage(file: File, quality = 0.8, outputMime = 'image/jpeg'): Promise<Blob> {
   const isHeic = /\.(heic|heif)$/i.test(file.name) || file.type === 'image/heic' || file.type === 'image/heif';
 
   if (isHeic) {
     const { default: heic2any } = await import('heic2any');
-    const result = await heic2any({ blob: file, toType: 'image/jpeg', quality });
-    return Array.isArray(result) ? result[0] : result;
+    // heic2any only supports jpeg/png; use png as lossless intermediate when targeting webp
+    const intermediateType = outputMime === 'image/webp' ? 'image/png' : (outputMime as 'image/jpeg' | 'image/png');
+    const result = await heic2any({ blob: file, toType: intermediateType, quality });
+    const intermediate = Array.isArray(result) ? result[0] : result;
+    if (outputMime === 'image/webp') {
+      return compressViaCanvas(intermediate, quality, outputMime);
+    }
+    return intermediate;
   }
 
-  return compressViaCanvas(file, quality);
+  return compressViaCanvas(file, quality, outputMime);
 }
 
-function compressViaCanvas(file: File, quality: number): Promise<Blob> {
+function compressViaCanvas(source: Blob, quality: number, outputMime: string): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    const objectUrl = URL.createObjectURL(file);
+    const objectUrl = URL.createObjectURL(source);
 
     img.onload = () => {
       URL.revokeObjectURL(objectUrl);
@@ -29,9 +35,6 @@ function compressViaCanvas(file: File, quality: number): Promise<Blob> {
       const ctx = canvas.getContext('2d');
       if (!ctx) return reject(new Error('Canvas context unavailable'));
       ctx.drawImage(img, 0, 0);
-
-      // GIFs fall back to PNG (canvas can't re-encode animated GIFs)
-      const outputMime = file.type === 'image/gif' ? 'image/png' : (file.type || 'image/jpeg');
 
       canvas.toBlob(
         (blob) => {
@@ -45,7 +48,7 @@ function compressViaCanvas(file: File, quality: number): Promise<Blob> {
 
     img.onerror = () => {
       URL.revokeObjectURL(objectUrl);
-      reject(new Error(`Failed to load image: ${file.name}`));
+      reject(new Error(`Failed to load image`));
     };
 
     img.src = objectUrl;

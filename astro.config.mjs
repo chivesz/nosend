@@ -8,6 +8,11 @@ export default defineConfig({
   site: 'https://nosend.io',
   integrations: [sitemap()],
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    server: {
+      watch: {
+        ignored: ['**/.gm/**']
+      }
+    }
   }
 });
