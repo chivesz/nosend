@@ -78,12 +78,6 @@ import Footer from '../components/Footer.astro';
             />
           </div>
           <p id="png-note" class="hidden flex-1 text-sm text-slate-500">PNG format doesn't support quality adjustment.</p>
-          <button
-            id="recompress-btn"
-            class="text-xs font-medium px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors whitespace-nowrap"
-          >
-            Apply
-          </button>
         </div>
       </div>
     </section>
@@ -218,8 +212,7 @@ import Footer from '../components/Footer.astro';
   const qualityValue = document.getElementById('quality-value')!;
   const pngNote = document.getElementById('png-note')!;
   const qualitySliderGroup = document.getElementById('quality-slider-group')!;
-  const recompressBtn = document.getElementById('recompress-btn')!;
-  const downloadAllRow = document.getElementById('download-all-row')!;
+const downloadAllRow = document.getElementById('download-all-row')!;
   const downloadAllBtn = document.getElementById('download-all-btn')!;
   const formatBtns = document.querySelectorAll<HTMLButtonElement>('.format-btn');
 
@@ -276,13 +269,7 @@ import Footer from '../components/Footer.astro';
     }, 400);
   });
 
-  recompressBtn.addEventListener('click', () => {
-    if (!currentFiles.length) return;
-    if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null; }
-    processFiles(currentFiles);
-  });
-
-  formatBtns.forEach(btn => {
+formatBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       currentFormat = btn.dataset.fmt!;
       const isPng = currentFormat === 'image/png';
