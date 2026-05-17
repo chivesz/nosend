@@ -2,6 +2,8 @@
  * Compresses an image file entirely in the browser.
  * HEIC/HEIF files are converted via heic2any before compression.
  * All other formats use the Canvas API — no server, no upload.
+ * WebP is encoded via the Canvas API where supported, falling back to
+ * a WASM build of libwebp (@jsquash/webp) on browsers like mobile Safari.
  */
 export async function compressImage(file: File, quality = 0.8, outputMime = 'image/jpeg'): Promise<Blob> {
   const isHeic = /\.(heic|heif)$/i.test(file.name) || file.type === 'image/heic' || file.type === 'image/heif';
@@ -21,51 +23,47 @@ export async function compressImage(file: File, quality = 0.8, outputMime = 'ima
   return compressViaCanvas(file, quality, outputMime);
 }
 
-function compressViaCanvas(source: Blob, quality: number, outputMime: string): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    const objectUrl = URL.createObjectURL(source);
+function canEncodeWebP(): boolean {
+  const c = document.createElement('canvas');
+  c.width = 1; c.height = 1;
+  return c.toDataURL('image/webp').startsWith('data:image/webp');
+}
 
-    img.onload = () => {
-      URL.revokeObjectURL(objectUrl);
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
+async function compressViaCanvas(source: Blob, quality: number, outputMime: string): Promise<Blob> {
+  const img = new Image();
+  const objectUrl = URL.createObjectURL(source);
 
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return reject(new Error('Canvas context unavailable'));
-      ctx.drawImage(img, 0, 0);
-
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) return reject(new Error('Canvas toBlob returned null'));
-          // Mobile Safari (and some Android browsers) don't support WebP encoding via canvas
-          // and silently fall back to PNG, which ignores quality. Re-encode as JPEG so the
-          // quality slider still works on unsupported browsers.
-          if (blob.type !== outputMime) {
-            canvas.toBlob(
-              (fallback) => {
-                if (fallback) resolve(fallback);
-                else resolve(blob);
-              },
-              'image/jpeg',
-              quality,
-            );
-          } else {
-            resolve(blob);
-          }
-        },
-        outputMime,
-        quality,
-      );
-    };
-
-    img.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      reject(new Error(`Failed to load image`));
-    };
-
+  await new Promise<void>((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error('Failed to load image'));
     img.src = objectUrl;
+  }).finally(() => URL.revokeObjectURL(objectUrl));
+
+  const canvas = document.createElement('canvas');
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas context unavailable');
+  ctx.drawImage(img, 0, 0);
+
+  // Use WASM libwebp on browsers that can't natively encode WebP (mobile Safari etc.)
+  if (outputMime === 'image/webp' && !canEncodeWebP()) {
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const { default: encode } = await import('@jsquash/webp/encode');
+    const arrayBuffer = await encode(imageData, { quality: Math.round(quality * 100) });
+    return new Blob([arrayBuffer], { type: 'image/webp' });
+  }
+
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (blob) resolve(blob);
+        else reject(new Error('Canvas toBlob returned null'));
+      },
+      outputMime,
+      quality,
+    );
   });
 }
 
