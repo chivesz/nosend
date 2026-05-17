@@ -419,6 +419,23 @@ formatBtns.forEach(btn => {
     dl.download = outputName;
     dl.classList.remove('hidden');
 
+    if (typeof navigator.share === 'function') {
+      dl.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const file = new File([compressed], outputName, { type: compressed.type });
+        try {
+          await navigator.share({ files: [file] });
+        } catch (err) {
+          if (err instanceof DOMException && err.name === 'AbortError') return;
+          // share failed — fall back to normal download
+          const a = Object.assign(document.createElement('a'), { href: url, download: outputName });
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+      });
+    }
+
     card.dataset.downloadUrl = url;
     card.dataset.downloadName = outputName;
   }
