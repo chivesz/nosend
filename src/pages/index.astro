@@ -388,7 +388,8 @@ import Footer from '../components/Footer.astro';
 
   function fillCard(card: HTMLElement, original: File, compressed: Blob, outputMime: string) {
     const savings = Math.round((1 - compressed.size / original.size) * 100);
-    const ext = getExtension(outputMime);
+    const actualMime = compressed.type || outputMime;
+    const ext = getExtension(actualMime);
     const outputName = original.name.replace(/\.[^.]*$/, '') + '.' + ext;
 
     card.querySelector('.card-status')!.textContent = savings > 0 ? `${savings}% smaller` : 'Already optimized';
