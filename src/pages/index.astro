@@ -220,6 +220,7 @@ const downloadAllRow = document.getElementById('download-all-row')!;
   let currentFiles: File[] = [];
   let currentFormat = 'image/jpeg';
   let dragCounter = 0;
+  const compressedBlobs = new Map<HTMLElement, { blob: Blob; name: string }>();
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   function setDropActive(active: boolean) {
@@ -292,6 +293,27 @@ formatBtns.forEach(btn => {
 
   downloadAllBtn.addEventListener('click', async () => {
     const cards = Array.from(results.querySelectorAll<HTMLElement>('[data-download-url]'));
+
+    // Use native share sheet on mobile (iOS/Android).
+    // Blobs are pre-cached so File creation is synchronous, preserving the user gesture.
+    // Skip canShare — it's unreliable for less common types like WebP on iOS.
+    if (typeof navigator.share === 'function') {
+      const files = cards.flatMap((card) => {
+        const entry = compressedBlobs.get(card);
+        return entry ? [new File([entry.blob], entry.name, { type: entry.blob.type })] : [];
+      });
+      if (files.length) {
+        try {
+          await navigator.share({ files });
+          return;
+        } catch (e) {
+          if (e instanceof DOMException && e.name === 'AbortError') return; // user cancelled
+          // share not supported for these file types — fall through to downloads
+        }
+      }
+    }
+
+    // Desktop fallback: sequential anchor clicks
     for (const card of cards) {
       const url = card.dataset.downloadUrl!;
       const name = card.dataset.downloadName!;
@@ -322,6 +344,7 @@ formatBtns.forEach(btn => {
 
   async function processFiles(files: File[]) {
     currentFiles = files;
+    compressedBlobs.clear();
     results.innerHTML = '';
     qualityRow.classList.remove('hidden');
     downloadAllRow.classList.remove('hidden');
@@ -387,6 +410,8 @@ formatBtns.forEach(btn => {
     card.querySelector('.card-new-size')!.textContent = formatBytes(compressed.size);
     card.querySelector('.card-savings')!.textContent = savings > 0 ? `(-${savings}%)` : '';
     card.querySelector('.card-sizes')!.classList.remove('hidden');
+
+    compressedBlobs.set(card, { blob: compressed, name: outputName });
 
     const url = URL.createObjectURL(compressed);
     const dl = card.querySelector('.card-download') as HTMLAnchorElement;
