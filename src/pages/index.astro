@@ -352,7 +352,7 @@ formatBtns.forEach(btn => {
           </svg>
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-slate-800 truncate">${name}</p>
+          <p class="text-sm font-medium text-slate-800 truncate card-filename">${name}</p>
           <div class="flex items-center gap-2 mt-1">
             <p class="text-xs text-slate-400 card-status flex-1 min-w-0 truncate">Processing…</p>
             <div class="flex items-center gap-1 flex-shrink-0 card-sizes hidden text-xs text-slate-500">
@@ -379,6 +379,7 @@ formatBtns.forEach(btn => {
     const ext = getExtension(actualMime);
     const outputName = original.name.replace(/\.[^.]*$/, '') + '.' + ext;
 
+    card.querySelector('.card-filename')!.textContent = outputName;
     card.querySelector('.card-status')!.textContent = savings > 0 ? `${savings}% smaller` : 'Already optimized';
     card.querySelector('.card-original-size')!.textContent = formatBytes(original.size);
     card.querySelector('.card-new-size')!.textContent = formatBytes(compressed.size);

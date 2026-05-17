@@ -38,8 +38,22 @@ function compressViaCanvas(source: Blob, quality: number, outputMime: string): P
 
       canvas.toBlob(
         (blob) => {
-          if (blob) resolve(blob);
-          else reject(new Error('Canvas toBlob returned null'));
+          if (!blob) return reject(new Error('Canvas toBlob returned null'));
+          // Mobile Safari (and some Android browsers) don't support WebP encoding via canvas
+          // and silently fall back to PNG, which ignores quality. Re-encode as JPEG so the
+          // quality slider still works on unsupported browsers.
+          if (blob.type !== outputMime) {
+            canvas.toBlob(
+              (fallback) => {
+                if (fallback) resolve(fallback);
+                else resolve(blob);
+              },
+              'image/jpeg',
+              quality,
+            );
+          } else {
+            resolve(blob);
+          }
         },
         outputMime,
         quality,
