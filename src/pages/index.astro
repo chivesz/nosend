@@ -61,8 +61,6 @@ import Footer from '../components/Footer.astro';
             <button id="fmt-webp" data-fmt="image/webp" class="format-btn text-xs font-semibold px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors">WEBP</button>
           </div>
         </div>
-        <!-- WebP unsupported warning -->
-        <p id="webp-note" class="hidden text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">Your browser doesn't support WebP natively. A small encoder will load automatically to handle it.</p>
         <!-- Quality row -->
         <div class="flex items-center gap-4">
           <div id="quality-slider-group" class="flex items-center gap-4 flex-1">
@@ -217,14 +215,7 @@ import Footer from '../components/Footer.astro';
 const downloadAllRow = document.getElementById('download-all-row')!;
   const downloadAllBtn = document.getElementById('download-all-btn')!;
   const formatBtns = document.querySelectorAll<HTMLButtonElement>('.format-btn');
-  const webpNote = document.getElementById('webp-note')!;
 
-  function supportsWebPEncoding(): boolean {
-    const c = document.createElement('canvas');
-    c.width = 1; c.height = 1;
-    return c.toDataURL('image/webp').startsWith('data:image/webp');
-  }
-  const webpSupported = supportsWebPEncoding();
 
   let currentFiles: File[] = [];
   let currentFormat = 'image/jpeg';
@@ -294,7 +285,7 @@ formatBtns.forEach(btn => {
       });
       qualitySliderGroup.classList.toggle('hidden', isPng);
       pngNote.classList.toggle('hidden', !isPng);
-      webpNote.classList.toggle('hidden', !(currentFormat === 'image/webp' && !webpSupported));
+
       if (currentFiles.length) processFiles(currentFiles);
     });
   });
