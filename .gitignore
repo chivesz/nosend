@@ -28,3 +28,6 @@ pnpm-debug.log*
 
 # gm-plugkit spool
 .gm/
+
+# Claude project instructions (local only)
+CLAUDE.md
