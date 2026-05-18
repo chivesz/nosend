@@ -20,6 +20,9 @@ pnpm-debug.log*
 # macOS-specific files
 .DS_Store
 
+# Windows shortcut files
+*.lnk
+
 # jetbrains setting folder
 .idea/
 
