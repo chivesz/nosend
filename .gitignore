@@ -34,3 +34,5 @@ CLAUDE.md
 
 # VS Code settings
 .vscode/
+.gm/browser-profile/
+.gm/browser-profile-*/
