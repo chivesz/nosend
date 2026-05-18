@@ -11,8 +11,8 @@
 
 ## What it does
 
-- Compresses JPG, PNG, WEBP, and GIF images in the browser, with no size limits and no batch limits
-- Converts HEIC/HEIF (iPhone photos) to compressed JPEG, on demand, client-side
+- Compresses JPG, PNG, WEBP, GIF, and HEIC/HEIF (iPhone photos) in the browser, with no size limits and no batch limits
+- Output format selector: choose JPEG, PNG, or WEBP regardless of input format
 - Adjustable quality slider with one-click recompress
 - Batch download of all compressed files
 - Drag and drop or click to browse
@@ -36,7 +36,7 @@ Most online image compressors send your files to a server to process them. That 
 | Styling | [Tailwind CSS v4](https://tailwindcss.com) |
 | Image compression | Browser Canvas API |
 | HEIC conversion | [heic2any](https://github.com/alexcorvi/heic2any) (loaded on demand) |
-| PDF tools (upcoming) | [pdf-lib](https://pdf-lib.js.org) |
+| WebP encoding | [@jsquash/webp](https://github.com/jamsinclair/jSquash) (WASM, for mobile Safari) |
 | Hosting | [Cloudflare Pages](https://pages.cloudflare.com) |
 | Domain | nosend.io via Cloudflare Registrar |
 
@@ -52,8 +52,6 @@ src/
 │   └── Footer.astro             Footer with privacy/terms links
 ├── pages/
 │   ├── index.astro              Homepage + compression tool
-│   ├── heic.astro               HEIC converter (coming soon)
-│   ├── pdf.astro                PDF tools (coming soon)
 │   ├── privacy.astro            Privacy policy
 │   ├── terms.astro              Terms of service
 │   └── blog/                    SEO blog posts
@@ -91,18 +89,8 @@ Node.js >= 22.12.0 required.
 |---|---|
 | `/` | Homepage + image compression tool |
 | `/blog` | SEO blog index |
-| `/heic` | HEIC to JPG converter (placeholder) |
-| `/pdf` | PDF tools (placeholder) |
 | `/privacy` | Privacy policy |
 | `/terms` | Terms of service |
-
----
-
-## Roadmap
-
-- [ ] Full HEIC dedicated page
-- [ ] PDF compression and tools (pdf-lib)
-- [ ] More SEO content targeting privacy-conscious image compression queries
 
 ---
 
