@@ -84,6 +84,10 @@ import Footer from '../components/Footer.astro';
 
     <!-- Results -->
     <section class="max-w-3xl mx-auto px-4 sm:px-6 pb-8">
+      <div id="results-header" class="hidden flex items-center justify-between mb-3">
+        <span class="text-sm text-slate-500" id="results-count"></span>
+        <button id="clear-all-btn" class="text-xs text-slate-400 hover:text-slate-600 transition-colors">Clear all</button>
+      </div>
       <div id="results" class="space-y-3"></div>
       <div id="download-all-row" class="hidden mt-5 flex justify-center">
         <button
@@ -202,27 +206,32 @@ import Footer from '../components/Footer.astro';
 <script>
   import { compressImage, formatBytes } from '../scripts/compress';
 
+  // --- DOM refs ---
   const dropZone = document.getElementById('drop-zone')!;
   const fileInput = document.getElementById('file-input') as HTMLInputElement;
   const dropIdle = document.getElementById('drop-idle')!;
   const dropActive = document.getElementById('drop-active')!;
   const results = document.getElementById('results')!;
+  const resultsHeader = document.getElementById('results-header')!;
+  const resultsCount = document.getElementById('results-count')!;
+  const clearAllBtn = document.getElementById('clear-all-btn')!;
   const qualityRow = document.getElementById('quality-row')!;
   const qualitySlider = document.getElementById('quality-slider') as HTMLInputElement;
   const qualityValue = document.getElementById('quality-value')!;
   const pngNote = document.getElementById('png-note')!;
   const qualitySliderGroup = document.getElementById('quality-slider-group')!;
-const downloadAllRow = document.getElementById('download-all-row')!;
+  const downloadAllRow = document.getElementById('download-all-row')!;
   const downloadAllBtn = document.getElementById('download-all-btn')!;
   const formatBtns = document.querySelectorAll<HTMLButtonElement>('.format-btn');
 
-
+  // --- State ---
   let currentFiles: File[] = [];
   let currentFormat = 'image/jpeg';
-  let dragCounter = 0;
-  const compressedBlobs = new Map<HTMLElement, { blob: Blob; name: string }>();
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+  const compressedBlobs = new Map<HTMLElement, { blob: Blob; name: string }>();
+  const thumbnailUrls = new Map<File, string>();
 
+  // --- Drop zone ---
   function setDropActive(active: boolean) {
     dropIdle.classList.toggle('hidden', active);
     dropActive.classList.toggle('hidden', !active);
@@ -236,42 +245,59 @@ const downloadAllRow = document.getElementById('download-all-row')!;
   });
 
   fileInput.addEventListener('change', () => {
-    if (fileInput.files?.length) processFiles(Array.from(fileInput.files));
+    if (fileInput.files?.length) addFiles(Array.from(fileInput.files).filter(isImageFile));
+    fileInput.value = '';
   });
 
-  dropZone.addEventListener('dragenter', (e) => {
+  let isDragActive = false;
+
+  // Hysteresis: activate immediately when inside, but only deactivate once
+  // the cursor is 20px beyond the border. The dead zone at the edge means
+  // oscillating at the border causes no state change at all.
+  document.addEventListener('dragover', (e) => {
     e.preventDefault();
-    if (++dragCounter === 1) setDropActive(true);
+    const r = dropZone.getBoundingClientRect();
+    const inside = e.clientX >= r.left && e.clientX <= r.right &&
+                   e.clientY >= r.top  && e.clientY <= r.bottom;
+    if (inside) {
+      if (!isDragActive) { isDragActive = true; setDropActive(true); }
+    } else if (isDragActive) {
+      const pad = 20;
+      const clearlyOutside = e.clientX < r.left - pad || e.clientX > r.right + pad ||
+                             e.clientY < r.top  - pad || e.clientY > r.bottom + pad;
+      if (clearlyOutside) { isDragActive = false; setDropActive(false); }
+    }
   });
 
-  dropZone.addEventListener('dragover', (e) => {
+  // Cursor left the browser window entirely.
+  document.addEventListener('dragleave', (e) => {
+    if (e.relatedTarget === null) { isDragActive = false; setDropActive(false); }
+  });
+
+  // Reset on any drop anywhere on the page.
+  document.addEventListener('drop', (e) => {
     e.preventDefault();
-  });
-
-  dropZone.addEventListener('dragleave', () => {
-    if (--dragCounter === 0) setDropActive(false);
+    isDragActive = false;
+    setDropActive(false);
   });
 
   dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
-    dragCounter = 0;
-    setDropActive(false);
     const files = Array.from(e.dataTransfer?.files ?? []).filter(isImageFile);
-    if (files.length) processFiles(files);
+    if (files.length) addFiles(files);
   });
 
+  // --- Quality slider ---
   qualitySlider.addEventListener('input', () => {
     qualityValue.textContent = qualitySlider.value;
     if (!currentFiles.length) return;
     if (debounceTimer) clearTimeout(debounceTimer);
     setDownloadsLocked(true);
-    debounceTimer = setTimeout(() => {
-      debounceTimer = null;
-      processFiles(currentFiles);
-    }, 400);
+    debounceTimer = setTimeout(() => { debounceTimer = null; reprocessAll(); }, 400);
   });
 
-formatBtns.forEach(btn => {
+  // --- Format buttons ---
+  formatBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       currentFormat = btn.dataset.fmt!;
       const isPng = currentFormat === 'image/png';
@@ -283,14 +309,27 @@ formatBtns.forEach(btn => {
         b.classList.toggle('border', !active);
         b.classList.toggle('border-slate-200', !active);
         b.classList.toggle('text-slate-600', !active);
+        b.classList.toggle('hover:bg-slate-100', !active);
       });
       qualitySliderGroup.classList.toggle('hidden', isPng);
       pngNote.classList.toggle('hidden', !isPng);
-
-      if (currentFiles.length) processFiles(currentFiles);
+      if (currentFiles.length) reprocessAll();
     });
   });
 
+  // --- Clear all ---
+  clearAllBtn.addEventListener('click', () => {
+    revokeAllDownloadUrls();
+    currentFiles.forEach(f => revokeThumbnailUrl(f));
+    currentFiles = [];
+    compressedBlobs.clear();
+    results.innerHTML = '';
+    resultsHeader.classList.add('hidden');
+    qualityRow.classList.add('hidden');
+    downloadAllRow.classList.add('hidden');
+  });
+
+  // --- Download all ---
   downloadAllBtn.addEventListener('click', async () => {
     const cards = Array.from(results.querySelectorAll<HTMLElement>('[data-download-url]'));
 
@@ -307,7 +346,7 @@ formatBtns.forEach(btn => {
           await navigator.share({ files });
           return;
         } catch (e) {
-          if (e instanceof DOMException && e.name === 'AbortError') return; // user cancelled
+          if (e instanceof DOMException && e.name === 'AbortError') return;
           // share not supported for these file types — fall through to downloads
         }
       }
@@ -325,6 +364,7 @@ formatBtns.forEach(btn => {
     }
   });
 
+  // --- Helpers ---
   function isImageFile(f: File) {
     return f.type.startsWith('image/') || /\.(heic|heif)$/i.test(f.name);
   }
@@ -342,18 +382,40 @@ formatBtns.forEach(btn => {
     return 'jpg';
   }
 
-  async function processFiles(files: File[]) {
-    currentFiles = files;
-    compressedBlobs.clear();
-    results.innerHTML = '';
+  function getThumbnailUrl(file: File): string {
+    if (!thumbnailUrls.has(file)) thumbnailUrls.set(file, URL.createObjectURL(file));
+    return thumbnailUrls.get(file)!;
+  }
+
+  function revokeThumbnailUrl(file: File) {
+    const url = thumbnailUrls.get(file);
+    if (url) { URL.revokeObjectURL(url); thumbnailUrls.delete(file); }
+  }
+
+  function revokeAllDownloadUrls() {
+    results.querySelectorAll<HTMLElement>('[data-download-url]').forEach(card => {
+      URL.revokeObjectURL(card.dataset.downloadUrl!);
+    });
+  }
+
+  function updateResultsCount() {
+    const n = currentFiles.length;
+    resultsCount.textContent = `${n} file${n !== 1 ? 's' : ''}`;
+  }
+
+  // --- File processing ---
+  async function addFiles(newFiles: File[]) {
+    currentFiles = [...currentFiles, ...newFiles];
     qualityRow.classList.remove('hidden');
     downloadAllRow.classList.remove('hidden');
+    resultsHeader.classList.remove('hidden');
+    updateResultsCount();
 
     const quality = parseInt(qualitySlider.value) / 100;
     const format = currentFormat;
 
-    await Promise.all(files.map(async (file) => {
-      const card = buildCard(file.name, file.size);
+    await Promise.all(newFiles.map(async (file) => {
+      const card = buildCard(file);
       results.appendChild(card);
       try {
         const compressed = await compressImage(file, quality, format);
@@ -366,18 +428,56 @@ formatBtns.forEach(btn => {
     setDownloadsLocked(false);
   }
 
-  function buildCard(name: string, _size: number): HTMLElement {
+  async function reprocessAll() {
+    if (!currentFiles.length) return;
+    revokeAllDownloadUrls();
+    compressedBlobs.clear();
+    results.innerHTML = '';
+    updateResultsCount();
+
+    const quality = parseInt(qualitySlider.value) / 100;
+    const format = currentFormat;
+
+    await Promise.all(currentFiles.map(async (file) => {
+      const card = buildCard(file);
+      results.appendChild(card);
+      try {
+        const compressed = await compressImage(file, quality, format);
+        fillCard(card, file, compressed, format);
+      } catch {
+        card.querySelector('.card-status')!.textContent = 'Could not process this file';
+      }
+    }));
+
+    setDownloadsLocked(false);
+  }
+
+  function removeFile(file: File, card: HTMLElement) {
+    const url = card.dataset.downloadUrl;
+    if (url) URL.revokeObjectURL(url);
+    compressedBlobs.delete(card);
+    card.remove();
+    currentFiles = currentFiles.filter(f => f !== file);
+    if (currentFiles.length === 0) {
+      resultsHeader.classList.add('hidden');
+      qualityRow.classList.add('hidden');
+      downloadAllRow.classList.add('hidden');
+    } else {
+      updateResultsCount();
+    }
+  }
+
+  function buildCard(file: File): HTMLElement {
+    const thumbUrl = getThumbnailUrl(file);
     const div = document.createElement('div');
     div.className = 'bg-white border border-slate-100 rounded-xl px-4 py-3 shadow-sm';
     div.innerHTML = `
       <div class="flex items-start gap-3">
-        <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0 text-slate-400 mt-0.5">
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-          </svg>
+        <div class="w-10 h-10 rounded-lg flex-shrink-0 mt-0.5 overflow-hidden bg-slate-100">
+          <img src="${thumbUrl}" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'" />
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-slate-800 truncate card-filename">${name}</p>
+          <p class="text-sm font-medium text-slate-800 truncate card-filename">${file.name}</p>
           <div class="flex items-center gap-2 mt-1">
             <p class="text-xs text-slate-400 card-status flex-1 min-w-0 truncate">Processing…</p>
             <div class="flex items-center gap-1 flex-shrink-0 card-sizes hidden text-xs text-slate-500">
@@ -391,10 +491,16 @@ formatBtns.forEach(btn => {
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
               </svg>
             </a>
+            <button class="card-remove flex-shrink-0 p-1.5 text-slate-300 hover:text-red-400 hover:bg-red-50 rounded-lg transition-colors" title="Remove">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
     `;
+    div.querySelector('.card-remove')!.addEventListener('click', () => removeFile(file, div));
     return div;
   }
 
@@ -405,12 +511,28 @@ formatBtns.forEach(btn => {
     const outputName = original.name.replace(/\.[^.]*$/, '') + '.' + ext;
 
     card.querySelector('.card-filename')!.textContent = outputName;
-    card.querySelector('.card-status')!.textContent = savings > 0 ? `${savings}% smaller` : 'Already optimized';
     card.querySelector('.card-original-size')!.textContent = formatBytes(original.size);
-    card.querySelector('.card-new-size')!.textContent = formatBytes(compressed.size);
-    card.querySelector('.card-savings')!.textContent = savings > 0 ? `(-${savings}%)` : '';
-    card.querySelector('.card-sizes')!.classList.remove('hidden');
 
+    const statusEl = card.querySelector('.card-status')!;
+    const newSizeEl = card.querySelector('.card-new-size')!;
+    const savingsEl = card.querySelector('.card-savings')!;
+
+    newSizeEl.textContent = formatBytes(compressed.size);
+
+    if (savings > 0) {
+      statusEl.textContent = `${savings}% smaller`;
+      newSizeEl.className = 'font-semibold text-emerald-600 card-new-size';
+      savingsEl.className = 'text-emerald-500 card-savings';
+      savingsEl.textContent = `(-${savings}%)`;
+    } else {
+      statusEl.textContent = 'Larger than original';
+      statusEl.classList.replace('text-slate-400', 'text-amber-500');
+      newSizeEl.className = 'font-semibold text-amber-500 card-new-size';
+      savingsEl.className = 'text-amber-400 card-savings';
+      savingsEl.textContent = savings < 0 ? `(+${Math.abs(savings)}%)` : '';
+    }
+
+    card.querySelector('.card-sizes')!.classList.remove('hidden');
     compressedBlobs.set(card, { blob: compressed, name: outputName });
 
     const url = URL.createObjectURL(compressed);
