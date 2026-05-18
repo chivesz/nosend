@@ -31,3 +31,6 @@ pnpm-debug.log*
 
 # Claude project instructions (local only)
 CLAUDE.md
+
+# VS Code settings
+.vscode/
