@@ -6,6 +6,11 @@
  * a WASM build of libwebp (@jsquash/webp) on browsers like mobile Safari.
  */
 export async function compressImage(file: File, quality = 0.8, outputMime = 'image/jpeg'): Promise<Blob> {
+  // PNG → PNG: canvas re-encodes to unoptimized 32-bit RGBA and ignores the quality param,
+  // so the output is almost always larger than the original. Return it unchanged.
+  const isInputPng = file.type === 'image/png' || /\.png$/i.test(file.name);
+  if (isInputPng && outputMime === 'image/png') return file;
+
   const isHeic = /\.(heic|heif)$/i.test(file.name) || file.type === 'image/heic' || file.type === 'image/heif';
 
   if (isHeic) {

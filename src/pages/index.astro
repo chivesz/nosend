@@ -36,7 +36,7 @@ import Footer from '../components/Footer.astro';
               <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
             </svg>
           </div>
-          <p class="text-base font-medium text-slate-700 mb-1">Drop images here or <span class="text-indigo-600">click to browse</span></p>
+          <p class="text-base font-medium text-slate-700 mb-1">Drop images here, <span class="text-indigo-600">click to browse</span>, or paste (Ctrl+V)</p>
           <p class="text-sm text-slate-400">JPG, PNG, WEBP, GIF, HEIC &mdash; no file size limit</p>
         </div>
         <div id="drop-active" class="hidden pointer-events-none">
@@ -261,6 +261,16 @@ import Footer from '../components/Footer.astro';
     e.preventDefault();
     setDropActive(false);
     const files = Array.from(e.dataTransfer?.files ?? []).filter(isImageFile);
+    if (files.length) addFiles(files);
+  });
+
+  // --- Paste ---
+  document.addEventListener('paste', (e) => {
+    const items = Array.from(e.clipboardData?.items ?? []);
+    const files = items
+      .filter(item => item.kind === 'file' && item.type.startsWith('image/'))
+      .map(item => item.getAsFile())
+      .filter((f): f is File => f !== null);
     if (files.length) addFiles(files);
   });
 
@@ -511,11 +521,19 @@ import Footer from '../components/Footer.astro';
 
     newSizeEl.textContent = formatBytes(compressed.size);
 
+    const isPngPassthrough = savings === 0 && outputMime === 'image/png' &&
+      (original.type === 'image/png' || /\.png$/i.test(original.name));
+
     if (savings > 0) {
       statusEl.textContent = `${savings}% smaller`;
       newSizeEl.className = 'font-semibold text-emerald-600 card-new-size';
       savingsEl.className = 'text-emerald-500 card-savings';
       savingsEl.textContent = `(-${savings}%)`;
+    } else if (isPngPassthrough) {
+      statusEl.textContent = "PNG files can't be compressed. Your original is ready to download.";
+      newSizeEl.className = 'font-semibold text-slate-500 card-new-size';
+      savingsEl.className = 'text-slate-400 card-savings';
+      savingsEl.textContent = '';
     } else {
       statusEl.textContent = 'Larger than original';
       statusEl.classList.replace('text-slate-400', 'text-amber-500');
