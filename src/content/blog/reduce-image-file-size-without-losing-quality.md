@@ -40,7 +40,7 @@ The right setting depends on the image. A photo with lots of fine detail (hair, 
 3. Use the quality slider to find the right balance between size and quality
 4. Download when you're happy with the result
 
-You can also use the recompress button to apply compression again if you need to go smaller.
+Adjust the slider and the image will recompress automatically.
 
 ## Tips for maximum file size reduction
 
@@ -57,3 +57,10 @@ You can also use the recompress button to apply compression again if you need to
 Reducing image file size without visible quality loss comes down to choosing the right format, using the right compression level, and resizing to an appropriate resolution. A quality setting of 75-85% for JPG gets you most of the way there with no perceptible difference.
 
 Try [nosend.io](https://nosend.io) to compress your images in the browser without uploading them anywhere.
+
+---
+
+**Related:**
+- [How to Compress Images Without Uploading Them](/blog/compress-images-without-uploading)
+- [How to Compress PNG Files Without Uploading Them](/blog/compress-png-without-uploading)
+- [How to Compress Photos Before Sending by Email](/blog/compress-photos-before-sending-email)

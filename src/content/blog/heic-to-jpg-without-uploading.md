@@ -54,3 +54,10 @@ Yes. nosend.io supports batch processing. Drop multiple files onto the page at o
 HEIC to JPG conversion doesn't require uploading your photos to anyone. A browser-based converter does the same job locally, with no server involved and no data leaving your device.
 
 Try it at [nosend.io](https://nosend.io).
+
+---
+
+**Related:**
+- [How to Compress Images Without Uploading Them](/blog/compress-images-without-uploading)
+- [How to Compress Photos Before Sending by Email](/blog/compress-photos-before-sending-email)
+- [Are Online Image Compressors Safe to Use?](/blog/are-online-image-compressors-safe)

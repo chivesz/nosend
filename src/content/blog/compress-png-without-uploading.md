@@ -30,10 +30,9 @@ If the image doesn't need transparency, converting from PNG to JPG or WEBP can r
 
 1. Go to [nosend.io](https://nosend.io)
 2. Drop your PNG file onto the page
-3. Adjust the quality slider to control how aggressively it compresses
-4. Download the result
+3. Download the result
 
-For lossless-style compression, set the quality slider to 100. For smaller files at the cost of some quality, bring it down. At 85-90% most people can't see a difference.
+PNG compression in the browser is lossless — quality is always preserved. If you need a smaller file and don't require transparency, switch the format selector to JPEG or WEBP for much more aggressive size reduction.
 
 ## When should I keep it as PNG?
 
@@ -62,3 +61,10 @@ Yes. nosend.io supports batch processing. Drop multiple files onto the page at o
 PNG compression doesn't require uploading your files anywhere. A browser-based tool handles it locally, in seconds, with no server involved.
 
 Try it at [nosend.io](https://nosend.io).
+
+---
+
+**Related:**
+- [How to Reduce Image File Size Without Losing Quality](/blog/reduce-image-file-size-without-losing-quality)
+- [How to Compress Images Without Uploading Them](/blog/compress-images-without-uploading)
+- [Are Online Image Compressors Safe to Use?](/blog/are-online-image-compressors-safe)

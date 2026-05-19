@@ -27,7 +27,7 @@ A typical 5MB phone photo compressed to 80% quality will come out around 1-1.5MB
 
 ## What if I need to send a lot of photos?
 
-nosend.io supports batch processing. Drop multiple photos at once and use the "Download All" button to get them in one go. You can then attach them all to your email or put them in a zip file first.
+nosend.io supports batch processing. Drop multiple photos at once and use the "Download All" button — on desktop it packages everything into a single ZIP file ready to attach.
 
 ## Should I resize the photos too?
 
@@ -52,3 +52,10 @@ These built-in options are convenient but upload your full-resolution photo to t
 ## The bottom line
 
 Compressing photos before emailing is quick and makes the experience better for everyone. A browser-based tool like [nosend.io](https://nosend.io) does it in seconds with no upload required.
+
+---
+
+**Related:**
+- [How to Convert HEIC to JPG Without Uploading Your Photos](/blog/heic-to-jpg-without-uploading)
+- [How to Reduce Image File Size Without Losing Quality](/blog/reduce-image-file-size-without-losing-quality)
+- [How to Compress Images Without Uploading Them](/blog/compress-images-without-uploading)
