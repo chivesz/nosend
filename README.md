@@ -12,10 +12,11 @@
 ## What it does
 
 - Compresses JPG, PNG, WEBP, GIF, and HEIC/HEIF (iPhone photos) entirely in the browser — no server, no upload
+- Reduce image file size without losing quality using an adjustable quality slider
 - Output format selector: convert to JPEG, PNG, or WEBP regardless of input format
-- Adjustable quality slider with live recompress on change
-- Batch processing with no file count or size limits
+- Batch processing with no file count or size limits — compress 1 or 200 images at once
 - Desktop: download a single file directly or all files as a ZIP; mobile: native share sheet for both
+- Works on iPhone, Android, Mac, Windows — Chrome, Safari, Firefox, Edge
 - Drag and drop or click to browse
 - Works offline after the first page load
 
@@ -23,9 +24,44 @@ No server. No account. No upload. No ads.
 
 ---
 
+## Use cases
+
+- Compress photos before sending by email or iMessage
+- Reduce image file size before uploading to WordPress, Shopify, or social media
+- Convert HEIC to JPG without uploading — straight from your iPhone camera roll
+- Compress images for web to improve page load speed
+- Resize and compress product photos before listing on Etsy or eBay
+- Batch compress screenshots, design assets, or RAW exports
+
+---
+
 ## Why client-side?
 
-Most online image compressors upload your files to a remote server to process them. That means your photos pass through someone else's infrastructure, get stored (temporarily or permanently), and are subject to their privacy policy. nosend.io does none of that — compression happens locally using the browser's Canvas API and WebAssembly. Every byte stays on your machine.
+Most online image compressors — including TinyPNG, Compressor.io, and iLoveIMG — upload your files to a remote server to process them. That means your photos pass through someone else's infrastructure, get stored (temporarily or permanently), and are subject to their privacy policy.
+
+nosend.io is a privacy-focused alternative. Compression happens locally using the browser's Canvas API and WebAssembly. Every byte stays on your machine. It works the same whether you're compressing personal photos, client work, or confidential documents.
+
+---
+
+## FAQ
+
+**Does nosend.io upload my files?**
+No. All compression runs in your browser using JavaScript and WebAssembly. Nothing is sent to any server.
+
+**Is there a file size limit?**
+No. TinyPNG caps files at 5MB. nosend.io has no size limit — compress full-resolution DSLR photos or iPhone ProRAW images without restrictions.
+
+**Is it free?**
+Yes. nosend.io is free to use and donation-supported. There are no plans, no paywalls, and no sign-up required.
+
+**What image formats are supported?**
+JPG, PNG, WEBP, GIF, and HEIC/HEIF. Output can be JPEG, PNG, or WEBP regardless of the input format.
+
+**Does it work on iPhone and Android?**
+Yes. nosend.io works on all modern browsers including mobile Safari on iPhone and Chrome on Android.
+
+**How is this different from TinyPNG or Squoosh?**
+TinyPNG uploads your files to their servers. Squoosh is also browser-based but requires more technical knowledge. nosend.io is designed to be as simple as possible — drop files, download results.
 
 ---
 
@@ -115,3 +151,9 @@ Issues and pull requests are welcome. Keep contributions focused: client-side on
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+---
+
+## Keywords
+
+image compressor, compress images without uploading, browser image compression, client-side image compression, HEIC to JPG converter, compress photos online, reduce image file size, TinyPNG alternative, Squoosh alternative, privacy image compressor, no upload image compressor, compress images for web, batch image compression, WebP converter, compress photos before emailing
