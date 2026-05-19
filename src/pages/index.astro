@@ -20,7 +20,8 @@ import Footer from '../components/Footer.astro';
         Compress images without<br class="hidden sm:block" /> uploading them
       </h1>
       <p class="text-lg text-slate-500 max-w-xl mx-auto">
-        Your files never leave your device. No server, no account, no size limits.
+        Your files never leave your device. No server, no account, no size limits.<br />
+        Automatically strips metadata.
       </p>
     </section>
 
@@ -521,19 +522,11 @@ import Footer from '../components/Footer.astro';
 
     newSizeEl.textContent = formatBytes(compressed.size);
 
-    const isPngPassthrough = savings === 0 && outputMime === 'image/png' &&
-      (original.type === 'image/png' || /\.png$/i.test(original.name));
-
     if (savings > 0) {
       statusEl.textContent = `${savings}% smaller`;
       newSizeEl.className = 'font-semibold text-emerald-600 card-new-size';
       savingsEl.className = 'text-emerald-500 card-savings';
       savingsEl.textContent = `(-${savings}%)`;
-    } else if (isPngPassthrough) {
-      statusEl.textContent = "PNG files can't be compressed. Your original is ready to download.";
-      newSizeEl.className = 'font-semibold text-slate-500 card-new-size';
-      savingsEl.className = 'text-slate-400 card-savings';
-      savingsEl.textContent = '';
     } else {
       statusEl.textContent = 'Larger than original';
       statusEl.classList.replace('text-slate-400', 'text-amber-500');
