@@ -62,5 +62,6 @@ Try [nosend.io](https://nosend.io) to compress your images in the browser withou
 
 **Related:**
 - [How to Compress Images Without Uploading Them](/blog/compress-images-without-uploading)
+- [JPG vs PNG vs WEBP: How to Choose the Right Image Format](/blog/jpg-vs-png-vs-webp)
 - [How to Compress PNG Files Without Uploading Them](/blog/compress-png-without-uploading)
 - [How to Compress Photos Before Sending by Email](/blog/compress-photos-before-sending-email)
