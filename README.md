@@ -1,6 +1,6 @@
-# nosend.io — Compress Images Without Uploading
+# nosend.io — Compress Images Without Uploading Them
 
-**[nosend.io](https://nosend.io)** is a privacy-first, client-side image compression tool. All processing runs entirely in your browser using the Canvas API. Your files never leave your device.
+**[nosend.io](https://nosend.io)** is a free, privacy-first image compressor that runs entirely in your browser. Compress JPG, PNG, WEBP, GIF, and HEIC files with no uploads, no account, and no file size limits. Your files never leave your device.
 
 [![Live site](https://img.shields.io/badge/live-nosend.io-indigo?style=flat-square)](https://nosend.io)
 [![Built with Astro](https://img.shields.io/badge/built%20with-Astro-orange?style=flat-square)](https://astro.build)
@@ -11,10 +11,11 @@
 
 ## What it does
 
-- Compresses JPG, PNG, WEBP, GIF, and HEIC/HEIF (iPhone photos) in the browser, with no size limits and no batch limits
-- Output format selector: choose JPEG, PNG, or WEBP regardless of input format
-- Adjustable quality slider with one-click recompress
-- Batch download of all compressed files
+- Compresses JPG, PNG, WEBP, GIF, and HEIC/HEIF (iPhone photos) entirely in the browser — no server, no upload
+- Output format selector: convert to JPEG, PNG, or WEBP regardless of input format
+- Adjustable quality slider with live recompress on change
+- Batch processing with no file count or size limits
+- Desktop: download a single file directly or all files as a ZIP; mobile: native share sheet for both
 - Drag and drop or click to browse
 - Works offline after the first page load
 
@@ -24,7 +25,7 @@ No server. No account. No upload. No ads.
 
 ## Why client-side?
 
-Most online image compressors send your files to a server to process them. That means your photos pass through someone else's infrastructure, get stored (temporarily or permanently), and are subject to their privacy policy. nosend.io does none of that. Every byte stays on your machine.
+Most online image compressors upload your files to a remote server to process them. That means your photos pass through someone else's infrastructure, get stored (temporarily or permanently), and are subject to their privacy policy. nosend.io does none of that — compression happens locally using the browser's Canvas API and WebAssembly. Every byte stays on your machine.
 
 ---
 
@@ -36,7 +37,8 @@ Most online image compressors send your files to a server to process them. That 
 | Styling | [Tailwind CSS v4](https://tailwindcss.com) |
 | Image compression | Browser Canvas API |
 | HEIC conversion | [heic2any](https://github.com/alexcorvi/heic2any) (loaded on demand) |
-| WebP encoding | [@jsquash/webp](https://github.com/jamsinclair/jSquash) (WASM, for mobile Safari) |
+| WebP encoding | [@jsquash/webp](https://github.com/jamsinclair/jSquash) (WASM, loaded on demand for mobile Safari) |
+| Batch ZIP download | [fflate](https://github.com/101arrowz/fflate) (loaded on demand) |
 | Hosting | [Cloudflare Pages](https://pages.cloudflare.com) |
 | Domain | nosend.io via Cloudflare Registrar |
 
@@ -57,7 +59,7 @@ src/
 │   └── blog/                    SEO blog posts
 ├── content/blog/                Markdown blog content
 ├── scripts/
-│   └── compress.ts              Compression logic (Canvas API + heic2any)
+│   └── compress.ts              Compression logic (Canvas API + heic2any + WASM WebP fallback)
 └── styles/global.css            Tailwind base styles
 ```
 
