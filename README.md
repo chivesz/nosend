@@ -1,6 +1,6 @@
 # nosend.io — Compress Images Without Uploading Them
 
-**[nosend.io](https://nosend.io)** is a free, privacy-first image compressor that runs entirely in your browser. Compress JPG, PNG, WEBP, GIF, and HEIC files with no uploads, no account, and no file size limits. Your files never leave your device.
+**[nosend.io](https://nosend.io)** is a free, privacy-first image compressor that runs entirely in your browser. Compress JPG, PNG, WEBP, GIF, and HEIC files with no uploads, no account, and no file size limits. Your files never leave your device — and all EXIF metadata is automatically stripped on export.
 
 [![Live site](https://img.shields.io/badge/live-nosend.io-indigo?style=flat-square)](https://nosend.io)
 [![Built with Astro](https://img.shields.io/badge/built%20with-Astro-orange?style=flat-square)](https://astro.build)
@@ -12,12 +12,13 @@
 ## What it does
 
 - Compresses JPG, PNG, WEBP, GIF, and HEIC/HEIF (iPhone photos) entirely in the browser — no server, no upload
+- Automatically strips all EXIF metadata (GPS location, timestamps, device info) on export
 - Reduce image file size without losing quality using an adjustable quality slider
 - Output format selector: convert to JPEG, PNG, or WEBP regardless of input format
 - Batch processing with no file count or size limits — compress 1 or 200 images at once
 - Desktop: download a single file directly or all files as a ZIP; mobile: native share sheet for both
+- Drag and drop, click to browse, or paste directly from clipboard (Ctrl+V)
 - Works on iPhone, Android, Mac, Windows — Chrome, Safari, Firefox, Edge
-- Drag and drop or click to browse
 - Works offline after the first page load
 
 No server. No account. No upload. No ads.
@@ -39,7 +40,7 @@ No server. No account. No upload. No ads.
 
 Most online image compressors — including TinyPNG, Compressor.io, and iLoveIMG — upload your files to a remote server to process them. That means your photos pass through someone else's infrastructure, get stored (temporarily or permanently), and are subject to their privacy policy.
 
-nosend.io is a privacy-focused alternative. Compression happens locally using the browser's Canvas API and WebAssembly. Every byte stays on your machine. It works the same whether you're compressing personal photos, client work, or confidential documents.
+nosend.io is a privacy-focused alternative. Compression happens locally using the browser's Canvas API and WebAssembly. Every byte stays on your machine. As a side effect of re-encoding through the Canvas API, all EXIF metadata — including GPS location, timestamps, and device information — is stripped from the output automatically. It works the same whether you're compressing personal photos, client work, or confidential documents.
 
 ---
 
@@ -156,4 +157,4 @@ MIT. See [LICENSE](LICENSE).
 
 ## Keywords
 
-image compressor, compress images without uploading, browser image compression, client-side image compression, HEIC to JPG converter, compress photos online, reduce image file size, TinyPNG alternative, Squoosh alternative, privacy image compressor, no upload image compressor, compress images for web, batch image compression, WebP converter, compress photos before emailing
+image compressor, compress images without uploading, browser image compression, client-side image compression, HEIC to JPG converter, compress photos online, reduce image file size, TinyPNG alternative, Squoosh alternative, privacy image compressor, no upload image compressor, compress images for web, batch image compression, WebP converter, compress photos before emailing, strip EXIF data, remove metadata from photos, remove location data from photos
