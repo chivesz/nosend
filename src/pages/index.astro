@@ -309,39 +309,54 @@ import Footer from '../components/Footer.astro';
   // --- Download all ---
   downloadAllBtn.addEventListener('click', async () => {
     const cards = Array.from(results.querySelectorAll<HTMLElement>('[data-download-url]'));
+    const entries = cards.flatMap((card) => {
+      const entry = compressedBlobs.get(card);
+      return entry ? [entry] : [];
+    });
+    if (!entries.length) return;
 
-    // Use native share sheet on mobile (iOS/Android).
-    // Blobs are pre-cached so File creation is synchronous, preserving the user gesture.
-    // Skip canShare — it's unreliable for less common types like WebP on iOS.
-    if (typeof navigator.share === 'function') {
-      const files = cards.flatMap((card) => {
-        const entry = compressedBlobs.get(card);
-        return entry ? [new File([entry.blob], entry.name, { type: entry.blob.type })] : [];
-      });
-      if (files.length) {
-        try {
-          await navigator.share({ files });
-          return;
-        } catch (e) {
-          if (e instanceof DOMException && e.name === 'AbortError') return;
-          // share not supported for these file types — fall through to downloads
-        }
+    // Mobile: Web Share for everything
+    if (isMobile() && typeof navigator.share === 'function') {
+      const files = entries.map(({ blob, name }) => new File([blob], name, { type: blob.type }));
+      try {
+        await navigator.share({ files });
+        return;
+      } catch (e) {
+        if (e instanceof DOMException && e.name === 'AbortError') return;
       }
     }
 
-    // Desktop fallback: sequential anchor clicks
-    for (const card of cards) {
-      const url = card.dataset.downloadUrl!;
-      const name = card.dataset.downloadName!;
-      const a = Object.assign(document.createElement('a'), { href: url, download: name });
+    // Desktop: single file → direct download, multiple → ZIP
+    if (entries.length === 1) {
+      const a = Object.assign(document.createElement('a'), {
+        href: cards[0].dataset.downloadUrl!,
+        download: entries[0].name,
+      });
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      await new Promise(r => setTimeout(r, 200));
+      return;
     }
+
+    const { zipSync } = await import('fflate');
+    const fileMap: Record<string, Uint8Array> = {};
+    await Promise.all(entries.map(async ({ blob, name }) => {
+      fileMap[name] = new Uint8Array(await blob.arrayBuffer());
+    }));
+    const zipped = zipSync(fileMap);
+    const zipUrl = URL.createObjectURL(new Blob([zipped], { type: 'application/zip' }));
+    const a = Object.assign(document.createElement('a'), { href: zipUrl, download: 'nosend-images.zip' });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(zipUrl), 60000);
   });
 
   // --- Helpers ---
+  function isMobile(): boolean {
+    return window.matchMedia('(pointer: coarse)').matches;
+  }
+
   function isImageFile(f: File) {
     return f.type.startsWith('image/') || /\.(heic|heif)$/i.test(f.name);
   }
@@ -518,7 +533,7 @@ import Footer from '../components/Footer.astro';
     dl.download = outputName;
     dl.classList.remove('hidden');
 
-    if (typeof navigator.share === 'function') {
+    if (isMobile() && typeof navigator.share === 'function') {
       dl.addEventListener('click', async (e) => {
         e.preventDefault();
         const file = new File([compressed], outputName, { type: compressed.type });
@@ -526,7 +541,6 @@ import Footer from '../components/Footer.astro';
           await navigator.share({ files: [file] });
         } catch (err) {
           if (err instanceof DOMException && err.name === 'AbortError') return;
-          // share failed — fall back to normal download
           const a = Object.assign(document.createElement('a'), { href: url, download: outputName });
           document.body.appendChild(a);
           a.click();
