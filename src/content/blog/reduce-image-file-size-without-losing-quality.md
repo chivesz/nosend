@@ -1,6 +1,6 @@
 ---
 title: "How to Reduce Image File Size Without Losing Quality"
-description: "Large image files slow down websites and clog up inboxes. Here's how to shrink them without making them look worse."
+description: "Large image files slow down websites and clog up inboxes. Here's how to reduce image file size without making them look noticeably worse."
 pubDate: 2026-05-16
 ---
 

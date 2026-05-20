@@ -1,6 +1,6 @@
 ---
 title: "How to Compress PNG Files Without Uploading Them"
-description: "PNG files can get large. Here's how to reduce PNG file size entirely in your browser, with nothing sent to any server."
+description: "PNG files can get large. Here's how to reduce PNG file size entirely in your browser, with no uploads and nothing sent to any server."
 pubDate: 2026-05-16
 ---
 
