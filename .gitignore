@@ -26,13 +26,8 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# gm-plugkit spool
-.gm/
-
 # Claude project instructions (local only)
 CLAUDE.md
 
 # VS Code settings
 .vscode/
-.gm/browser-profile/
-.gm/browser-profile-*/
