@@ -11,11 +11,6 @@ export default defineConfig({
     plugins: [tailwindcss()],
     optimizeDeps: {
       exclude: ['@jsquash/webp']
-    },
-    server: {
-      watch: {
-        ignored: ['**/.gm/**']
-      }
     }
   }
 });
