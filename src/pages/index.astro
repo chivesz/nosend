@@ -126,6 +126,32 @@ const webAppSchema = {
           Download All
         </button>
       </div>
+
+      <!-- Share nudge -->
+      <div id="share-banner" class="hidden mt-5">
+        <div class="flex items-center gap-3 bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-3">
+          <svg class="w-4 h-4 flex-shrink-0 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <p id="share-msg" class="flex-1 text-sm text-slate-600 leading-snug"></p>
+          <button
+            id="share-copy-btn"
+            class="flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+          >
+            Copy link
+          </button>
+          <button
+            id="share-dismiss-btn"
+            class="flex-shrink-0 p-1 text-slate-400 hover:text-slate-600 transition-colors"
+            title="Dismiss"
+            aria-label="Dismiss"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
     </section>
 
     <!-- Why nosend -->
@@ -249,6 +275,12 @@ const webAppSchema = {
   const downloadAllRow = document.getElementById('download-all-row')!;
   const downloadAllBtn = document.getElementById('download-all-btn')!;
   const formatBtns = document.querySelectorAll<HTMLButtonElement>('.format-btn');
+  const shareBanner = document.getElementById('share-banner')!;
+  const shareMsg = document.getElementById('share-msg')!;
+  const shareCopyBtn = document.getElementById('share-copy-btn') as HTMLButtonElement;
+  const shareDismissBtn = document.getElementById('share-dismiss-btn')!;
+  // Below this, "saved X" isn't a compelling hook — lead with privacy instead.
+  const SHARE_SAVINGS_MIN = 50 * 1024;
   if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
     document.getElementById('desktop-hint')?.classList.add('hidden');
     document.getElementById('mobile-hint')?.classList.remove('hidden');
@@ -259,7 +291,37 @@ const webAppSchema = {
   let currentFormat = 'image/jpeg';
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   const compressedBlobs = new Map<HTMLElement, { blob: Blob; name: string }>();
+  const savedBytesByCard = new Map<HTMLElement, number>();
   const thumbnailUrls = new Map<File, string>();
+  let shareDismissed = false;
+
+  function updateShareBanner() {
+    if (shareDismissed) { shareBanner.classList.add('hidden'); return; }
+    const count = savedBytesByCard.size;
+    if (count === 0) { shareBanner.classList.add('hidden'); return; }
+
+    let saved = 0;
+    for (const n of savedBytesByCard.values()) if (n > 0) saved += n;
+
+    const headline = saved >= SHARE_SAVINGS_MIN
+      ? `Saved you ${formatBytes(saved)}`
+      : `${count} ${count === 1 ? 'image' : 'images'} cleaned of metadata`;
+    shareMsg.innerHTML =
+      `<span class="font-semibold text-slate-800">${headline}</span> ` +
+      `&mdash; nosend keeps your files private. Share it?`;
+    shareBanner.classList.remove('hidden');
+  }
+
+  shareCopyBtn.addEventListener('click', async () => {
+    await navigator.clipboard.writeText('https://nosend.io/');
+    shareCopyBtn.textContent = 'Copied!';
+    setTimeout(() => { shareCopyBtn.textContent = 'Copy link'; }, 2000);
+  });
+
+  shareDismissBtn.addEventListener('click', () => {
+    shareDismissed = true;
+    shareBanner.classList.add('hidden');
+  });
 
   // --- Drop zone ---
   function setDropActive(active: boolean) {
@@ -341,10 +403,12 @@ const webAppSchema = {
     currentFiles.forEach(f => revokeThumbnailUrl(f));
     currentFiles = [];
     compressedBlobs.clear();
+    savedBytesByCard.clear();
     results.innerHTML = '';
     resultsHeader.classList.add('hidden');
     qualityRow.classList.add('hidden');
     downloadAllRow.classList.add('hidden');
+    shareBanner.classList.add('hidden');
   });
 
   // --- Download all ---
@@ -459,12 +523,14 @@ const webAppSchema = {
     }));
 
     setDownloadsLocked(false);
+    updateShareBanner();
   }
 
   async function reprocessAll() {
     if (!currentFiles.length) return;
     revokeAllDownloadUrls();
     compressedBlobs.clear();
+    savedBytesByCard.clear();
     results.innerHTML = '';
     updateResultsCount();
 
@@ -483,21 +549,25 @@ const webAppSchema = {
     }));
 
     setDownloadsLocked(false);
+    updateShareBanner();
   }
 
   function removeFile(file: File, card: HTMLElement) {
     const url = card.dataset.downloadUrl;
     if (url) URL.revokeObjectURL(url);
     compressedBlobs.delete(card);
+    savedBytesByCard.delete(card);
     card.remove();
     currentFiles = currentFiles.filter(f => f !== file);
     if (currentFiles.length === 0) {
       resultsHeader.classList.add('hidden');
       qualityRow.classList.add('hidden');
       downloadAllRow.classList.add('hidden');
+      shareBanner.classList.add('hidden');
     } else {
       updateResultsCount();
     }
+    updateShareBanner();
   }
 
   function buildCard(file: File): HTMLElement {
@@ -567,6 +637,7 @@ const webAppSchema = {
 
     card.querySelector('.card-sizes')!.classList.remove('hidden');
     compressedBlobs.set(card, { blob: compressed, name: outputName });
+    savedBytesByCard.set(card, original.size - compressed.size);
 
     const url = URL.createObjectURL(compressed);
     const dl = card.querySelector('.card-download') as HTMLAnchorElement;
