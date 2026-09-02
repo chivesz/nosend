@@ -2,9 +2,31 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+
+const webAppSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'nosend',
+  url: 'https://nosend.io/',
+  applicationCategory: 'MultimediaApplication',
+  operatingSystem: 'Any (browser-based)',
+  description:
+    'Free image compressor and HEIC converter that runs entirely in your browser. Files are never uploaded to a server. No account, no size limit.',
+  browserRequirements: 'Requires JavaScript. Works offline after first load.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  featureList: [
+    'Client-side compression — no uploads',
+    'No file size limit',
+    'Batch compression',
+    'HEIC to JPG/PNG/WEBP',
+    'Automatic metadata removal',
+    'Works offline',
+  ],
+};
 ---
 
 <Layout>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(webAppSchema)} />
   <Header />
 
   <main class="flex-1">
