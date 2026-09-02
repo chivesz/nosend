@@ -60,4 +60,5 @@ Try it at [nosend.io](https://nosend.io).
 **Related:**
 - [How to Compress Images Without Uploading Them](/blog/compress-images-without-uploading)
 - [How to Compress Photos Before Sending by Email](/blog/compress-photos-before-sending-email)
+- [Squoosh Alternative: Batch, HEIC, and Still 100% Local](/blog/squoosh-alternative)
 - [Are Online Image Compressors Safe to Use?](/blog/are-online-image-compressors-safe)

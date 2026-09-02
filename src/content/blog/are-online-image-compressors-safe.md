@@ -57,4 +57,6 @@ Try [nosend.io](https://nosend.io) for compression that never leaves your device
 - [How to Remove Metadata from Photos Before Sharing Them](/blog/remove-metadata-from-photos)
 - [How to Compress Images Without Uploading Them](/blog/compress-images-without-uploading)
 - [How to Convert HEIC to JPG Without Uploading Your Photos](/blog/heic-to-jpg-without-uploading)
+- [TinyPNG Alternative: Free, No 5MB Limit, No Upload](/blog/tinypng-alternative)
+- [Squoosh Alternative: Batch, HEIC, and Still 100% Local](/blog/squoosh-alternative)
 - [How to Reduce Image File Size Without Losing Quality](/blog/reduce-image-file-size-without-losing-quality)

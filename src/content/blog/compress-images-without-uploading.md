@@ -4,7 +4,7 @@ description: "Most image compressors send your files to a server. Here's how to 
 pubDate: 2026-05-16
 ---
 
-Most people don't think twice about dragging a photo into an online image compressor. But almost every popular tool — TinyPNG, Squoosh, Compressor.io — sends your file to a server to process it. That means your photo travels across the internet, lands on someone else's computer, gets processed, and comes back. Sometimes it's stored. Sometimes it isn't. You rarely know.
+Most people don't think twice about dragging a photo into an online image compressor. But most popular tools — TinyPNG, Compressor.io, iLoveIMG — send your file to a server to process it. That means your photo travels across the internet, lands on someone else's computer, gets processed, and comes back. Sometimes it's stored. Sometimes it isn't. You rarely know. (Squoosh is a rare exception that runs locally — [more on that here](/blog/squoosh-alternative).)
 
 For most images that's fine. But what about a photo of your passport? A screenshot of a bank statement? A picture of your kids?
 
@@ -58,3 +58,5 @@ Try it at [nosend.io](https://nosend.io).
 - [How to Reduce Image File Size Without Losing Quality](/blog/reduce-image-file-size-without-losing-quality)
 - [Are Online Image Compressors Safe to Use?](/blog/are-online-image-compressors-safe)
 - [How to Compress PNG Files Without Uploading Them](/blog/compress-png-without-uploading)
+- [TinyPNG Alternative: Free, No 5MB Limit, No Upload](/blog/tinypng-alternative)
+- [Squoosh Alternative: Batch, HEIC, and Still 100% Local](/blog/squoosh-alternative)
