@@ -594,10 +594,10 @@ const webAppSchema = {
     div.innerHTML = `
       <div class="flex items-start gap-3">
         <div class="w-10 h-10 rounded-lg flex-shrink-0 mt-0.5 overflow-hidden bg-slate-100">
-          <img src="${thumbUrl}" alt="" class="w-full h-full object-cover" onerror="this.style.display='none'" />
+          <img src="${thumbUrl}" alt="" class="w-full h-full object-cover card-thumb" />
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-slate-800 truncate card-filename">${file.name}</p>
+          <p class="text-sm font-medium text-slate-800 truncate card-filename"></p>
           <div class="flex items-center gap-2 mt-1">
             <p class="text-xs text-slate-400 card-status flex-1 min-w-0 truncate">Processing…</p>
             <div class="flex items-center gap-1 flex-shrink-0 card-sizes hidden text-xs text-slate-500">
@@ -620,6 +620,12 @@ const webAppSchema = {
         </div>
       </div>
     `;
+    // Set as text, not HTML, so a file name can never inject markup or code.
+    div.querySelector('.card-filename')!.textContent = file.name;
+    // Hide the thumbnail if the browser can't preview the file (e.g. HEIC).
+    // A listener rather than an inline onerror="" so it works under the CSP.
+    const thumb = div.querySelector<HTMLImageElement>('.card-thumb')!;
+    thumb.addEventListener('error', () => { thumb.style.display = 'none'; });
     div.querySelector('.card-remove')!.addEventListener('click', () => removeFile(file, div));
     return div;
   }
