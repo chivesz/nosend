@@ -45,6 +45,12 @@ async function compressViaCanvas(source: Blob, quality: number, outputMime: stri
 
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas context unavailable');
+  // JPEG has no alpha channel, so transparent pixels would encode as black.
+  // Paint a white background first so they come out white instead.
+  if (outputMime === 'image/jpeg') {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
   ctx.drawImage(img, 0, 0);
 
   // Use WASM libwebp on browsers that can't natively encode WebP (mobile Safari etc.)

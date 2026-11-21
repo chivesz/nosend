@@ -414,10 +414,10 @@ const webAppSchema = {
   // --- Download all ---
   downloadAllBtn.addEventListener('click', async () => {
     const cards = Array.from(results.querySelectorAll<HTMLElement>('[data-download-url]'));
-    const entries = cards.flatMap((card) => {
+    const entries = uniqueNames(cards.flatMap((card) => {
       const entry = compressedBlobs.get(card);
       return entry ? [entry] : [];
-    });
+    }));
     if (!entries.length) return;
 
     // Mobile: Web Share for everything
@@ -458,6 +458,23 @@ const webAppSchema = {
   });
 
   // --- Helpers ---
+  // Different inputs can share an output name (noise.png and noise.webp both
+  // become noise.jpg). Rename repeats to "noise (1).jpg" etc. so none get
+  // overwritten in the zip or share sheet. Compared case-insensitively since
+  // Windows and macOS treat Noise.jpg and noise.jpg as the same file.
+  function uniqueNames<T extends { name: string }>(entries: T[]): T[] {
+    const used = new Set<string>();
+    return entries.map((entry) => {
+      const dot = entry.name.lastIndexOf('.');
+      const base = dot > 0 ? entry.name.slice(0, dot) : entry.name;
+      const ext = dot > 0 ? entry.name.slice(dot) : '';
+      let name = entry.name;
+      for (let n = 1; used.has(name.toLowerCase()); n++) name = `${base} (${n})${ext}`;
+      used.add(name.toLowerCase());
+      return name === entry.name ? entry : { ...entry, name };
+    });
+  }
+
   function isMobile(): boolean {
     return window.matchMedia('(pointer: coarse)').matches;
   }
