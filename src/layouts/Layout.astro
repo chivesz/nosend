@@ -7,6 +7,8 @@ interface Props {
   canonical?: string;
   ogType?: string;
   publishedTime?: string;
+  /** Keep this page out of search results (e.g. the 404 page). */
+  noindex?: boolean;
 }
 
 const {
@@ -15,6 +17,7 @@ const {
   canonical = Astro.url.href,
   ogType = 'website',
   publishedTime,
+  noindex = false,
 } = Astro.props;
 ---
 
@@ -24,7 +27,7 @@ const {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
