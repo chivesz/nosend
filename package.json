@@ -25,5 +25,8 @@
   "devDependencies": {
     "@fontsource/inter": "^5.2.8",
     "sharp": "^0.34.5"
+  },
+  "overrides": {
+    "vite": "^7.3.8"
   }
 }
