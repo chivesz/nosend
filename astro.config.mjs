@@ -44,13 +44,19 @@ function serviceWorker() {
  * Inline scripts are allowed by exact hash, computed here from the built
  * HTML, rather than allowing all inline scripts.
  *
+ * 'unsafe-eval' is required by heic2any: its worker builds functions with
+ * new Function() at startup, and blob: workers inherit this page's policy.
+ * Without it, HEIC conversion fails. It only affects which code may run;
+ * the rules on where data may go (connect-src, img-src, form-action) are
+ * unchanged, so files still can't leave the device.
+ *
  * REPORT_ONLY: while true, browsers only log what the policy would block
  * (visible in the DevTools Console) without blocking anything. Flip to
  * false once testing shows no violations.
  * @returns {import('astro').AstroIntegration}
  */
 function securityHeaders() {
-  const REPORT_ONLY = true;
+  const REPORT_ONLY = false;
   return {
     name: 'nosend-security-headers',
     hooks: {
@@ -67,7 +73,7 @@ function securityHeaders() {
 
         const policy = [
           "default-src 'self'",
-          `script-src 'self' ${[...hashes].join(' ')} https://static.cloudflareinsights.com 'wasm-unsafe-eval'`,
+          `script-src 'self' ${[...hashes].join(' ')} https://static.cloudflareinsights.com 'wasm-unsafe-eval' 'unsafe-eval'`,
           "connect-src 'self' https://cloudflareinsights.com",
           "img-src 'self' blob: data:",
           "worker-src 'self' blob:",
